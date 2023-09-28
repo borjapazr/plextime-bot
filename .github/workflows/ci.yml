@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: ✅ Validate project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout project
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📄 Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: 📥 Install dependencies
+        run: make install
+
+      - name: 🚔 Check dependencies
+        run: make dependencies
+
+      - name: 🖍️ Check types
+        run: make types
+
+      - name: 💅 Check format
+        run: make format
+
+      - name: 📑 Check lint
+        run: make lint
+
+  test:
+    name: 🧑‍🔬 Test project
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: ⬇️ Checkout project
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: 📄 Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: 📥 Install dependencies
+        run: make install
+
+      - name: 🧪 Run tests
+        run: make test

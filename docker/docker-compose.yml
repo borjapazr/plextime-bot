@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  plextime-bot:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    image: plextime-bot
+    container_name: plextime-bot
+    restart: always
+    environment:
+      - PLEXTIME_TIMEZONE=${PLEXTIME_TIMEZONE}
+      - PLEXTIME_USER=${PLEXTIME_USER}
+      - PLEXTIME_PASSWORD=${PLEXTIME_PASSWORD}
+      - PLEXTIME_CHECKIN_JOURNAL_OPTION=${PLEXTIME_CHECKIN_JOURNAL_OPTION}
+      - PLEXTIME_CHECKOUT_JOURNAL_OPTION=${PLEXTIME_CHECKOUT_JOURNAL_OPTION}
+      - PLEXTIME_ORIGIN=${PLEXTIME_ORIGIN}
+      - PLEXTIME_CHECKIN_RANDOM_MARGIN=${PLEXTIME_CHECKIN_RANDOM_MARGIN}
+      - PLEXTIME_CHECKOUT_RANDOM_MARGIN=${PLEXTIME_CHECKOUT_RANDOM_MARGIN}
+      - PLEXTIME_TELEGRAM_NOTIFICATIONS=${PLEXTIME_TELEGRAM_NOTIFICATIONS}
+      - PLEXTIME_TELEGRAM_BOT_TOKEN=${PLEXTIME_TELEGRAM_BOT_TOKEN}
+      - PLEXTIME_TELEGRAM_CHANNEL_ID=${PLEXTIME_TELEGRAM_CHANNEL_ID}
+      - TZ=${PLEXTIME_TIMEZONE}
+    volumes:
+      - ./../logs:/bot/logs
+
+networks:
+  default:
+    name: plextime-bot-network

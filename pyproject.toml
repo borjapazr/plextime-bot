@@ -1,0 +1,150 @@
+[tool.poetry]
+name = "plextime_bot"
+version = "1.0.0"
+description = "🤖⏰ Bot for automatic checkin and checkout on Plextime platform."
+keywords = ["python3"]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+
+authors = ["Borja Paz Rodríguez <borjapazr@gmail.com>"]
+maintainers = ["Borja Paz Rodríguez <borjapazr@gmail.com>"]
+
+include = ["README.md", "py.typed"]
+readme = "README.md"
+license = "MIT"
+
+homepage = "https://github.com/inditex/plextime-bot"
+repository = "https://github.com/inditex/plextime-bot"
+documentation = "https://github.com/borjapazr/plextime-bot/blob/main/README.md"
+
+packages = [{ include = "plextime_bot" }]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+python-dotenv = "^1.0.0"
+coloredlogs = "^15.0.1"
+requests = "^2.31.0"
+dataclass-wizard = "^0.22.2"
+schedule = "^1.2.0"
+colorama = "^0.4.6"
+pycryptodome = "^3.18.0"
+art = "^6.1"
+pytz = "^2023.3.post1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+deptry = "^0.12.0"
+mypy = "^1.5.1"
+pre-commit = "^2.20.0"
+ruff = "^0.0.287"
+black = "^23.9.1"
+types-requests = "^2.31.0.2"
+types-pyjwt = "^1.7.1"
+
+[tool.poetry.scripts]
+plextime_bot = "plextime_bot:start_plextime_bot"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ['tests']
+
+[tool.black]
+line-length = 120
+target-version = ["py37"]
+include = "\\.pyi?$"
+preview = true
+
+[tool.mypy]
+files = ["plextime_bot"]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = false
+warn_unused_ignores = true
+show_error_codes = true
+warn_redundant_casts = true
+strict_optional = true
+
+[tool.ruff]
+target-version = "py37"
+line-length = 120
+ignore-init-module-imports = true
+fix = true
+fixable = ["ALL"]
+unfixable = []
+select = [
+  "A",    # Builtins
+  "ARG",  # Unused arguments
+  "B",    # Bugbear
+  "BLE",  # Blind except
+  "C4",   # Comprehensions
+  "C90",  # mccabe
+  "COM",  # Commas
+  "DTZ",  # Datetimes
+  "ERA",  # Commented-out code
+  "EXE",  # Executable
+  "F401", # Unused imports
+  "G",    # Logging format
+  "I",    # Isort
+  "ICN",  # Import conventions
+  "INP",  # Disallow PEP-420 (Implicit namespace packages)
+  "INT",  # gettext
+  "ISC",  # Implicit str concat
+  "N",    # PEP-8 Naming
+  "NPY",  # Numpy
+  "PGH",  # Pygrep hooks
+  "PIE",  # Unnecessary code
+  "PL",   # Pylint
+  "PT",   # Pytest
+  "PTH",  # Use Pathlib
+  "PYI",  # Stub files
+  "RET",  # Return
+  "RUF",  # Ruff
+  "RSE",  # Raise
+  "S",    # Bandit
+  "SIM",  # Code simplification
+  "SLF",  # Private member access
+  "T20",  # Print
+  "TCH",  # Type checking
+  "TID",  # Tidy imports
+  "UP",   # Pyupgrade
+  "W",    # Warnings
+  "YTT",  # sys.version
+]
+ignore = [
+  "PLR0913", # Too many arguments
+  "RUF009",  # Dataclass defaults
+  "S311",    # Cryptographic
+  "S324",    # Cryptographic
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401", "F403", "F405"]
+"tests/*" = ["ANN", "ARG", "INP001", "S101"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.pylint]
+max-args = 15
+max-branches = 20
+max-returns = 10
+max-statements = 80
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["pytz", "colorama"]

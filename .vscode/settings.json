@@ -1,0 +1,18 @@
+{
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": true,
+            "source.organizeImports": true
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "cSpell.enabled": false,
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "ruff.enable": true,
+    "ruff.fixAll": true,
+    "ruff.organizeImports": true,
+    "explorer.excludeGitIgnore": false
+}
