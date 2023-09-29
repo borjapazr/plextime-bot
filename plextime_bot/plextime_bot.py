@@ -34,8 +34,8 @@ LOGGER = Logger.get_logger("plextime_bot")
 
 class TaskType(Enum):
     CHECK = 0
-    CHECKIN = 1
-    CHECKOUT = 2
+    CHECK_IN = 1
+    CHECK_OUT = 2
     SCHEDULE = 3
 
 
@@ -81,7 +81,7 @@ class PlextimeBot:
                     ),
                 )
         except PlextimeApiError as e:
-            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to checkin: {e}")
+            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to check-in: {e}")
 
     def _random_checkout(self) -> None:
         try:
@@ -96,7 +96,7 @@ class PlextimeBot:
                     ),
                 )
         except PlextimeApiError as e:
-            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to checkout: {e}")
+            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to check-out: {e}")
 
     def __log_and_send_notification_if_enabled(self, message: str) -> None:
         LOGGER.info(message)
@@ -115,14 +115,14 @@ class PlextimeBot:
                     day_name = DAY_NAMES[entry.week_day]
                     getattr(every(), day_name).at(entry.hour_in, PLEXTIME_TIMEZONE).do(self._random_checkin).tag(
                         TaskType.CHECK,
-                        TaskType.CHECKIN,
+                        TaskType.CHECK_IN,
                     )
                     getattr(every(), day_name).at(entry.hour_out, PLEXTIME_TIMEZONE).do(self._random_checkout).tag(
                         TaskType.CHECK,
-                        TaskType.CHECKOUT,
+                        TaskType.CHECK_OUT,
                     )
                     self.__log_and_send_notification_if_enabled(
-                        f"⏰ {day_name.capitalize()} -> checkin at {entry.hour_in} and checkout at {entry.hour_out}",
+                        f"⏰ {day_name.capitalize()} -> check-in at {entry.hour_in} and check-out at {entry.hour_out}",
                     )
         except PlextimeApiError as e:
             self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to schedule checks: {e}")
@@ -130,7 +130,7 @@ class PlextimeBot:
     def start(self) -> None:
         LOGGER.info("Hi! I'm %s. Nice to meet you! 🫡\n\n%s", AUTHOR, text2art(APP_NAME))
         self.__log_and_send_notification_if_enabled(
-            f"🤖 Plextime Bot configured and started to checkin and checkout on behalf of <{PLEXTIME_USER}>",
+            f"🤖 Plextime Bot configured and started to check-in and check-out on behalf of <{PLEXTIME_USER}>",
         )
 
         getattr(every(), PLEXTIME_BOT_REFRESH_DAY).at(PLEXTIME_BOT_REFRESH_HOUR, PLEXTIME_TIMEZONE).do(

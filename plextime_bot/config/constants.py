@@ -41,8 +41,8 @@ PLEXTIME_CHECKOUT_JOURNAL_OPTION = getenv("PLEXTIME_CHECKOUT_JOURNAL_OPTION", "8
 PLEXTIME_CHECKIN_RANDOM_MARGIN = int(getenv("PLEXTIME_CHECKIN_RANDOM_MARGIN", "0"))
 PLEXTIME_CHECKOUT_RANDOM_MARGIN = int(getenv("PLEXTIME_CHECKOUT_RANDOM_MARGIN", "0"))
 PLEXTIME_ORIGIN = int(getenv("PLEXTIME_ORIGIN", "2"))
-PLEXTIME_CHECKIN_MESSAGE = "↘️ Checkin successfully completed on {checkin_datetime}"
-PLEXTIME_CHECKOUT_MESSAGE = "↙️ Checkout successfully completed on {checkout_datetime}"
+PLEXTIME_CHECKIN_MESSAGE = "↘️ Check-in successfully completed on {checkin_datetime}"
+PLEXTIME_CHECKOUT_MESSAGE = "↙️ Check-out successfully completed on {checkout_datetime}"
 PLEXTIME_TELEGRAM_NOTIFICATIONS = getenv("PLEXTIME_TELEGRAM_NOTIFICATIONS", "false") == "true"
 PLEXTIME_TELEGRAM_BOT_TOKEN = getenv("PLEXTIME_TELEGRAM_BOT_TOKEN", None)
 PLEXTIME_TELEGRAM_CHANNEL_ID = getenv("PLEXTIME_TELEGRAM_CHANNEL_ID", None)

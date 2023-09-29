@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "plextime_bot"
 version = "1.0.0"
-description = "🤖⏰ Bot for automatic checkin and checkout on Plextime platform."
+description = "🤖⏰ Bot for automatic check-in and check-out on Plextime platform."
 keywords = ["python3"]
 classifiers = [
   "Operating System :: OS Independent",
