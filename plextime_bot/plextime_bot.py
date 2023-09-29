@@ -110,8 +110,13 @@ class PlextimeBot:
                 clear(TaskType.CHECK)
 
             timetable: Timetable = self.__plextime_api_client.retrieve_current_timetable()
+            sorted_timetable_entries = sorted(timetable.entries, key=lambda e: e.week_day)
             if timetable:
-                for entry in timetable.entries:
+                self.__log_and_send_notification_if_enabled(
+                    "📅 Scheduled check-ins and check-outs based on timetable"
+                    f" {timetable.name} ({timetable.description})",
+                )
+                for entry in sorted_timetable_entries:
                     day_name = DAY_NAMES[entry.week_day]
                     getattr(every(), day_name).at(entry.hour_in, PLEXTIME_TIMEZONE).do(self._random_checkin).tag(
                         TaskType.CHECK,
@@ -122,7 +127,7 @@ class PlextimeBot:
                         TaskType.CHECK_OUT,
                     )
                     self.__log_and_send_notification_if_enabled(
-                        f"⏰ {day_name.capitalize()} -> check-in at {entry.hour_in} and check-out at {entry.hour_out}",
+                        f"⏰ {day_name.capitalize()}: ➡️ Check-in - {entry.hour_in} | ⬅️ Check-out - {entry.hour_out}",
                     )
         except PlextimeApiError as e:
             self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to schedule checks: {e}")
@@ -130,7 +135,7 @@ class PlextimeBot:
     def start(self) -> None:
         LOGGER.info("Hi! I'm %s. Nice to meet you! 🫡\n\n%s", AUTHOR, text2art(APP_NAME))
         self.__log_and_send_notification_if_enabled(
-            f"🤖 Plextime Bot configured and started to check-in and check-out on behalf of <{PLEXTIME_USER}>",
+            f"🤖 Plextime Bot is configured to check in and out on behalf of 👤 {PLEXTIME_USER}",
         )
 
         getattr(every(), PLEXTIME_BOT_REFRESH_DAY).at(PLEXTIME_BOT_REFRESH_HOUR, PLEXTIME_TIMEZONE).do(
@@ -139,7 +144,7 @@ class PlextimeBot:
             TaskType.SCHEDULE,
         )
         self.__log_and_send_notification_if_enabled(
-            f"🔄 Timetable updating task enabled for {PLEXTIME_BOT_REFRESH_DAY.capitalize()}s at"
+            f"🔄 Timetable update task is set for {PLEXTIME_BOT_REFRESH_DAY.capitalize()}s at"
             f" {PLEXTIME_BOT_REFRESH_HOUR}",
         )
 

@@ -128,6 +128,7 @@ ignore = [
   "RUF009",  # Dataclass defaults
   "S311",    # Cryptographic
   "S324",    # Cryptographic
+  "S608",    # SQL
 ]
 
 [tool.ruff.per-file-ignores]
