@@ -9,6 +9,7 @@ services:
     container_name: plextime-bot
     restart: always
     environment:
+      - PLEXTIME_LOG_LEVEL=${PLEXTIME_LOG_LEVEL}
       - PLEXTIME_TIMEZONE=${PLEXTIME_TIMEZONE}
       - PLEXTIME_USER=${PLEXTIME_USER}
       - PLEXTIME_PASSWORD=${PLEXTIME_PASSWORD}

@@ -119,7 +119,7 @@ class CheckOutResult:
     result: str = json_field("result", all=True)
 
 
-class PlextimeApiError(Exception):
+class PlextimeApiClientError(Exception):
     def __init__(self, message: str = "An error ocurred in Plextime API Client") -> None:
         super().__init__(message)
 
@@ -314,8 +314,8 @@ class PlextimeApiClient:
         login_data_json = self.__put(PLEXTIME_LOGIN_PATH, login_body)
 
         if login_data_json["result"] != "OK":
-            LOGGER.error("Missing or invalid credentials!")
-            raise PlextimeApiError("Missing or invalid credentials!")
+            LOGGER.error("🚨 Missing or invalid credentials!")
+            raise PlextimeApiClientError("Missing or invalid credentials!")
 
         login_data = fromdict(LoginData, login_data_json)
 
@@ -332,8 +332,8 @@ class PlextimeApiClient:
             response = self.__session.request(method, url, headers=headers, verify=True, **kwargs)
             response.raise_for_status()
         except RequestException as e:
-            LOGGER.error("Error ocurring while making request to %s", url)
-            raise PlextimeApiError(f"Error ocurring while making request to {url}") from e
+            LOGGER.error("🚨 Error ocurring while making request to %s", url)
+            raise PlextimeApiClientError(f"Error ocurring while making request to {url}") from e
 
         return response
 

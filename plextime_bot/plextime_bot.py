@@ -4,7 +4,7 @@ from time import sleep
 from typing import Optional
 
 from art import text2art
-from schedule import clear, every, get_jobs, run_pending
+from schedule import clear, every, get_jobs, idle_seconds, run_pending
 
 from plextime_bot.config.constants import (
     APP_NAME,
@@ -24,7 +24,7 @@ from plextime_bot.config.constants import (
     PLEXTIME_TIMEZONE,
     PLEXTIME_USER,
 )
-from plextime_bot.services.plextime_api_client import PlextimeApiClient, PlextimeApiError, Timetable
+from plextime_bot.services.plextime_api_client import PlextimeApiClient, PlextimeApiClientError, Timetable
 from plextime_bot.services.telegram_notificator import TelegramNotificator
 from plextime_bot.utils.date_manager import current_local_datetime_human_readable
 from plextime_bot.utils.logger import Logger
@@ -52,12 +52,13 @@ class PlextimeBot:
 
     def __validate_required_env_vars(self) -> None:
         if not PLEXTIME_USER or not PLEXTIME_PASSWORD:
-            LOGGER.error("'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory!")
+            LOGGER.error("🚨 'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory!")
             raise PlextimeBotError("'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory!")
 
         if PLEXTIME_TELEGRAM_NOTIFICATIONS and (not PLEXTIME_TELEGRAM_BOT_TOKEN or not PLEXTIME_TELEGRAM_CHANNEL_ID):
             LOGGER.error(
-                "'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are mandatory!",
+                "🚨 'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are"
+                " mandatory!",
             )
             raise PlextimeBotError(
                 "'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are mandatory!",
@@ -80,8 +81,11 @@ class PlextimeBot:
                         checkin_datetime=current_local_datetime_human_readable(),
                     ),
                 )
-        except PlextimeApiError as e:
-            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to check-in: {e}")
+        except PlextimeApiClientError as e:
+            self.__log_and_send_notification_if_enabled(
+                f"🚨 An error ocurred while trying to check-in: {e}",
+                is_error=True,
+            )
 
     def _random_checkout(self) -> None:
         try:
@@ -95,11 +99,14 @@ class PlextimeBot:
                         checkout_datetime=current_local_datetime_human_readable(),
                     ),
                 )
-        except PlextimeApiError as e:
-            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to check-out: {e}")
+        except PlextimeApiClientError as e:
+            self.__log_and_send_notification_if_enabled(
+                f"🚨 An error ocurred while trying to check-out: {e}",
+                is_error=True,
+            )
 
-    def __log_and_send_notification_if_enabled(self, message: str) -> None:
-        LOGGER.info(message)
+    def __log_and_send_notification_if_enabled(self, message: str, is_error: bool = False) -> None:
+        LOGGER.info(message) if not is_error else LOGGER.error(message)
         if self.__telegram_notificator:
             self.__telegram_notificator.send_notification(message)
 
@@ -129,8 +136,11 @@ class PlextimeBot:
                     self.__log_and_send_notification_if_enabled(
                         f"⏰ {day_name.capitalize()}: ➡️ Check-in - {entry.hour_in} | ⬅️ Check-out - {entry.hour_out}",
                     )
-        except PlextimeApiError as e:
-            self.__log_and_send_notification_if_enabled(f"An error ocurred while trying to schedule checks: {e}")
+        except PlextimeApiClientError as e:
+            self.__log_and_send_notification_if_enabled(
+                f"🚨 An error ocurred while trying to schedule checks: {e}",
+                is_error=True,
+            )
 
     def start(self) -> None:
         LOGGER.info("Hi! I'm %s. Nice to meet you! 🫡\n\n%s", AUTHOR, text2art(APP_NAME))
@@ -151,5 +161,12 @@ class PlextimeBot:
         self.__schedule_checks()
 
         while True:
+            seconds_until_next_job = idle_seconds()
+
+            if seconds_until_next_job is None:
+                break
+
+            if seconds_until_next_job > 0:
+                sleep(seconds_until_next_job)
+
             run_pending()
-            sleep(1)

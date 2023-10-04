@@ -5,9 +5,11 @@ from pathlib import Path
 
 import coloredlogs
 
+from plextime_bot.config.constants import PLEXTIME_LOG_LEVEL
+
 
 class Logger:
-    __LEVEL = logging.INFO
+    __LEVEL = PLEXTIME_LOG_LEVEL
     __LOG_FILE = "./logs/records.log"
     __FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 

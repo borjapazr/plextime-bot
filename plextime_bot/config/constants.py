@@ -20,6 +20,7 @@ AUTHOR = "@borjapazr"
 PLEXTIME_BOT_REFRESH_DAY = DAY_NAMES[1]
 PLEXTIME_BOT_REFRESH_HOUR = "03:00"
 
+PLEXTIME_LOG_LEVEL = getenv("PLEXTIME_LOG_LEVEL", "INFO").upper()
 PLEXTIME_TIMEZONE = getenv("PLEXTIME_TIMEZONE", "UTC")
 PLEXTIME_API_URL = "https://plextime.plexus.services/api/v1/"
 PLEXTIME_LOGIN_PATH = "admin/login"
