@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plextime_bot"
-version = "1.0.0"
+version = "1.1.0"
 description = "🤖⏰ Bot for automatic check-in and check-out on Plextime platform."
 keywords = ["python3"]
 classifiers = [
@@ -153,7 +153,7 @@ DEP002 = ["pytz", "colorama"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "1.0.0"
+version = "1.1.0"
 version_files = ["pyproject.toml:version", "docker/Dockerfile:version"]
 version_scheme = "pep440"
 tag_format = "v$version"
