@@ -74,6 +74,7 @@ Usage: make TARGET [ARGUMENTS]
 
 Targets:
   build                     Build wheel file using poetry
+  commit                    Commit changes using conventional commits
   dependencies              Check Poetry lock file consistency and for obsolete dependencies
   env                       Create .env file from .env.template
   format                    Run code formatting
@@ -87,6 +88,7 @@ Targets:
   stop/docker               Stop the service running in a Docker container
   test                      Test code with PyTest
   types                     Run type checks
+  version                   Create a new version and update changelog file
 ```
 
 ## ⚖️ License
