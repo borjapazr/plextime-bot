@@ -54,6 +54,7 @@ install: requirements ## Install the poetry environment and install the pre-comm
 ifneq ($(CI_ENVIRONMENT), true)
 	@echo "🚀 Installing pre-commit hooks..."
 	@$(POETRY) run pre-commit install
+	@$(POETRY) run pre-commit install --hook-type commit-msg --hook-type pre-push
 	@$(POETRY) shell
 endif
 
@@ -108,3 +109,13 @@ dependencies: ## Check Poetry lock file consistency and for obsolete dependencie
 .PHONY: logs
 logs: ## Show logs for all or c=<name> containers
 	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) --env-file .env logs --tail=100 -f $(c)
+
+.PHONY: commit
+commit: ## Commit changes using conventional commits
+	@echo "📝 Committing changes..."
+	@$(POETRY) run cz commit
+
+.PHONY: version
+version: ## Create a new version and update changelog file
+	@echo "📦 Creating a new version..."
+	@$(POETRY) run cz bump --changelog

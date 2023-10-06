@@ -47,6 +47,7 @@ ruff = "^0.0.287"
 black = "^23.9.1"
 types-requests = "^2.31.0.2"
 types-pyjwt = "^1.7.1"
+commitizen = "^3.10.0"
 
 [tool.poetry.scripts]
 plextime_bot = "plextime_bot:start_plextime_bot"
@@ -149,3 +150,16 @@ ban-relative-imports = "all"
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["pytz", "colorama"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "1.0.0"
+version_files = ["pyproject.toml:version", "docker/Dockerfile:version"]
+version_scheme = "pep440"
+tag_format = "v$version"
+annotated_tag = true
+update_changelog_on_bump = true
+bump_message = "bump: version $current_version → $new_version"
+changelog_file = "CHANGELOG.md"
+gpg_sign = true
+always_signoff = true

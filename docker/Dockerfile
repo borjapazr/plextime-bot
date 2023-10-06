@@ -31,7 +31,7 @@ EOF
 FROM python:3.11-alpine as runtime
 
 LABEL maintainer="Borja Paz Rodríguez <borjapazr@gmail.com>" \
-  version="1.0" \
+  version="1.0.0" \
   description="🤖⏰ Bot for automatic check-in and check-out on Plextime platform" \
   license="MIT" \
   org.label-schema.name="PlextimeBot" \

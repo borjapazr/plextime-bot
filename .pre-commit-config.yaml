@@ -1,10 +1,17 @@
-exclude: ".git|.tox"
-default_stages: [commit]
-fail_fast: true
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+default_stages: [commit, push]
 
 repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.10.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+      - id: commitizen-branch
+        stages: [post-commit, push]
+
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
+    rev: v3.14.0
     hooks:
       - id: pyupgrade
         args: ["--py37-plus"]
@@ -51,7 +58,7 @@ repos:
       - id: black
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.287
+    rev: v0.0.292
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
