@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.6-labs
 
-FROM python:3.11-buster as builder
+ARG PYTHON_VERSION=3.11
+
+FROM python:${PYTHON_VERSION}-buster as builder
 
 ENV PYTHONFAULTHANDLER=true \
   PYTHONUNBUFFERED=true \
@@ -16,19 +18,19 @@ RUN pip install poetry==${POETRY_VERSION}
 
 WORKDIR /bot
 
-COPY pyproject.toml poetry.lock ./
+COPY --link pyproject.toml poetry.lock ./
 
 RUN poetry install --no-cache --no-interaction --no-ansi --no-root --only main
 
-COPY plextime_bot ./plextime_bot/
-COPY README.md py.typed ./
+COPY --link plextime_bot ./plextime_bot/
+COPY --link README.md py.typed ./
 
 RUN <<EOF
 poetry build --no-cache -f wheel
 ./.venv/bin/pip install --no-cache-dir --only-binary :all: dist/*.whl
 EOF
 
-FROM python:3.11-alpine as runtime
+FROM python:${PYTHON_VERSION}-alpine as runtime
 
 LABEL maintainer="Borja Paz Rodríguez <borjapazr@gmail.com>" \
   version="1.1.0" \
@@ -50,5 +52,7 @@ ENV PYTHONFAULTHANDLER=true \
 WORKDIR /bot
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+VOLUME ["/bot/logs"]
 
 CMD ["python", "-m", "plextime_bot"]
