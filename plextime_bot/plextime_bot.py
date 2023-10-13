@@ -52,16 +52,16 @@ class PlextimeBot:
 
     def __validate_required_env_vars(self) -> None:
         if not PLEXTIME_USER or not PLEXTIME_PASSWORD:
-            LOGGER.error("🚨 'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory!")
-            raise PlextimeBotError("'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory!")
+            LOGGER.error("🚨 'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory")
+            raise PlextimeBotError("'PLEXTIME_USER' and 'PLEXTIME_PASSWORD' environment variables are mandatory")
 
         if PLEXTIME_TELEGRAM_NOTIFICATIONS and (not PLEXTIME_TELEGRAM_BOT_TOKEN or not PLEXTIME_TELEGRAM_CHANNEL_ID):
             LOGGER.error(
                 "🚨 'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are"
-                " mandatory!",
+                " mandatory",
             )
             raise PlextimeBotError(
-                "'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are mandatory!",
+                "'PLEXTIME_TELEGRAM_BOT_TOKEN' and 'PLEXTIME_TELEGRAM_CHANNEL_ID' environment variables are mandatory",
             )
 
     def __get_telegram_notificator_if_enabled(self) -> Optional[TelegramNotificator]:
@@ -112,20 +112,27 @@ class PlextimeBot:
 
     def __schedule_checks(self) -> None:
         try:
-            timetable: Timetable = self.__plextime_api_client.retrieve_current_timetable()
+            LOGGER.info("🔂 Scheduling checks")
 
-            if not timetable:
+            new_timetable: Timetable = self.__plextime_api_client.retrieve_current_timetable()
+
+            no_timetable_found = not new_timetable
+            timetable_changed = (
+                not self.__current_timetable or self.__current_timetable.timetable_id != new_timetable.timetable_id
+            )
+
+            if no_timetable_found:
                 self.__log_and_send_notification_if_enabled(
-                    "🚨 No timetable found for configuring checks!",
+                    "🚨 No timetable found for configuring checks",
                     is_error=True,
                 )
-            elif not self.__current_timetable or self.__current_timetable.timetable_id != timetable.timetable_id:
+            elif timetable_changed:
                 if self.__current_timetable:
                     self.__log_and_send_notification_if_enabled(
-                        "🔔 A new timetable has been detected!",
+                        "🆕 A new timetable has been detected",
                     )
 
-                self.__current_timetable = timetable
+                self.__current_timetable = new_timetable
 
                 if get_jobs(TaskType.CHECK):
                     LOGGER.info("🧹 Cleaning up old schedulings")
@@ -133,10 +140,10 @@ class PlextimeBot:
 
                 self.__log_and_send_notification_if_enabled(
                     "📅 Scheduled check-ins and check-outs based on timetable"
-                    f" {timetable.name} ({timetable.description})",
+                    f" {new_timetable.name} ({new_timetable.description})",
                 )
 
-                sorted_timetable_entries = sorted(timetable.entries, key=lambda e: e.week_day)
+                sorted_timetable_entries = sorted(new_timetable.entries, key=lambda e: e.week_day)
 
                 for entry in sorted_timetable_entries:
                     day_name = DAY_NAMES[entry.week_day]
@@ -151,6 +158,8 @@ class PlextimeBot:
                     self.__log_and_send_notification_if_enabled(
                         f"⏰ {day_name.capitalize()}: ➡️ Check-in - {entry.hour_in} | ⬅️ Check-out - {entry.hour_out}",
                     )
+            else:
+                LOGGER.info("💭 No timetable change detected so it is not necessary to reschedule checks")
         except PlextimeApiClientError as e:
             self.__log_and_send_notification_if_enabled(
                 f"🚨 An error ocurred while trying to schedule checks: {e}",

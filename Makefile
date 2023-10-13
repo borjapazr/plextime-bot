@@ -41,7 +41,7 @@ ifndef POETRY
 	@echo "📦🧩 poetry is not available. Please install poetry."
 	@exit 1
 endif
-	@echo "🆗 The necessary dependencies are already installed!"
+	@echo "🆗 The necessary dependencies are already installed"
 
 .PHONY: env
 env: ## Create .env file from .env.template

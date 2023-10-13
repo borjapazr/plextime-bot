@@ -314,8 +314,8 @@ class PlextimeApiClient:
         login_data_json = self.__put(PLEXTIME_LOGIN_PATH, login_body)
 
         if login_data_json["result"] != "OK":
-            LOGGER.error("🚨 Missing or invalid credentials!")
-            raise PlextimeApiClientError("Missing or invalid credentials!")
+            LOGGER.error("🚨 Missing or invalid credentials")
+            raise PlextimeApiClientError("Missing or invalid credentials")
 
         login_data = fromdict(LoginData, login_data_json)
 
