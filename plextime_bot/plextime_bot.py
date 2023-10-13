@@ -11,7 +11,6 @@ from plextime_bot.config.constants import (
     AUTHOR,
     DAY_NAMES,
     PLEXTIME_API_URL,
-    PLEXTIME_BOT_REFRESH_DAY,
     PLEXTIME_BOT_REFRESH_HOUR,
     PLEXTIME_CHECKIN_MESSAGE,
     PLEXTIME_CHECKIN_RANDOM_MARGIN,
@@ -49,6 +48,7 @@ class PlextimeBot:
         self.__validate_required_env_vars()
         self.__plextime_api_client = PlextimeApiClient(PLEXTIME_API_URL, PLEXTIME_USER, PLEXTIME_PASSWORD)  # type: ignore[arg-type]
         self.__telegram_notificator = self.__get_telegram_notificator_if_enabled()
+        self.__current_timetable: Optional[Timetable] = None
 
     def __validate_required_env_vars(self) -> None:
         if not PLEXTIME_USER or not PLEXTIME_PASSWORD:
@@ -112,17 +112,32 @@ class PlextimeBot:
 
     def __schedule_checks(self) -> None:
         try:
-            if get_jobs(TaskType.CHECK):
-                LOGGER.info("🧹 Cleaning up old schedulings")
-                clear(TaskType.CHECK)
-
             timetable: Timetable = self.__plextime_api_client.retrieve_current_timetable()
-            sorted_timetable_entries = sorted(timetable.entries, key=lambda e: e.week_day)
-            if timetable:
+
+            if not timetable:
+                self.__log_and_send_notification_if_enabled(
+                    "🚨 No timetable found for configuring checks!",
+                    is_error=True,
+                )
+            elif not self.__current_timetable or self.__current_timetable.timetable_id != timetable.timetable_id:
+                if self.__current_timetable:
+                    self.__log_and_send_notification_if_enabled(
+                        "🔔 A new timetable has been detected!",
+                    )
+
+                self.__current_timetable = timetable
+
+                if get_jobs(TaskType.CHECK):
+                    LOGGER.info("🧹 Cleaning up old schedulings")
+                    clear(TaskType.CHECK)
+
                 self.__log_and_send_notification_if_enabled(
                     "📅 Scheduled check-ins and check-outs based on timetable"
                     f" {timetable.name} ({timetable.description})",
                 )
+
+                sorted_timetable_entries = sorted(timetable.entries, key=lambda e: e.week_day)
+
                 for entry in sorted_timetable_entries:
                     day_name = DAY_NAMES[entry.week_day]
                     getattr(every(), day_name).at(entry.hour_in, PLEXTIME_TIMEZONE).do(self._random_checkin).tag(
@@ -148,14 +163,13 @@ class PlextimeBot:
             f"🤖 Plextime Bot is configured to check in and out on behalf of 👤 {PLEXTIME_USER}",
         )
 
-        getattr(every(), PLEXTIME_BOT_REFRESH_DAY).at(PLEXTIME_BOT_REFRESH_HOUR, PLEXTIME_TIMEZONE).do(
+        every().day.at(PLEXTIME_BOT_REFRESH_HOUR, PLEXTIME_TIMEZONE).do(
             self.__schedule_checks,
         ).tag(
             TaskType.SCHEDULE,
         )
         self.__log_and_send_notification_if_enabled(
-            f"🔄 Timetable update task is set for {PLEXTIME_BOT_REFRESH_DAY.capitalize()}s at"
-            f" {PLEXTIME_BOT_REFRESH_HOUR}",
+            f"🔄 Timetable update task is set for every day at {PLEXTIME_BOT_REFRESH_HOUR}",
         )
 
         self.__schedule_checks()
