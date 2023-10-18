@@ -332,8 +332,8 @@ class PlextimeApiClient:
             response = self.__session.request(method, url, headers=headers, verify=True, **kwargs)
             response.raise_for_status()
         except RequestException as e:
-            LOGGER.error("🚨 Error ocurring while making request to %s", url)
-            raise PlextimeApiClientError(f"Error ocurring while making request to {url}") from e
+            LOGGER.error("🚨 An error ocurred while making request to %s", url)
+            raise PlextimeApiClientError(f"An error ocurred while making request to {url}") from e
 
         return response
 
