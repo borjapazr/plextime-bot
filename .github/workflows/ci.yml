@@ -7,7 +7,7 @@ on:
   pull_request:
 
 concurrency:
-  group: ci-${{ github.workflow }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,20 +19,8 @@ jobs:
       - name: ⬇️ Checkout project
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: 📄 Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-
-      - name: 📥 Install dependencies
-        run: make install
+      - name: 🧙‍♂️ Setup environment
+        uses: ./.github/actions/setup-environment
 
       - name: 🚔 Check dependencies
         run: make dependencies
@@ -55,20 +43,8 @@ jobs:
       - name: ⬇️ Checkout project
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: 📄 Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-
-      - name: 📥 Install dependencies
-        run: make install
+      - name: 🧙‍♂️ Setup environment
+        uses: ./.github/actions/setup-environment
 
       - name: 🧪 Run tests
         run: make test
