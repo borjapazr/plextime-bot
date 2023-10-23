@@ -31,8 +31,10 @@ runs:
       with:
         path: .venv
         key:
-          ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/poetry.lock',
-          '**/.tool-versions') }}
+          ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}-${{
+          hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}-
 
     - name: 📥 Install dependencies
       if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
