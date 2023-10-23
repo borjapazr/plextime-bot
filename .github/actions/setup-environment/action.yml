@@ -1,0 +1,40 @@
+name: setup-environment
+description: Composite action to setup environment and install dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: 🤹‍♂️ Install asdf
+      uses: asdf-vm/actions/setup@v2
+
+    - name: 🗂️ Cache asdf
+      id: cache-asdf
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-asdf
+      with:
+        path: ~/.asdf
+        key: ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}
+        restore-keys: |
+          ${{ runner.os }}-se-${{ env.cache-name }}-
+
+    - name: 🛠️ Install tools from .tool-versions
+      if: ${{ steps.cache-asdf.outputs.cache-hit != 'true' }}
+      continue-on-error: true
+      uses: asdf-vm/actions/install@v2
+
+    - name: 🗂️ Cache venv
+      id: cache-venv
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-venv
+      with:
+        path: .venv
+        key:
+          ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/poetry.lock',
+          '**/.tool-versions') }}
+
+    - name: 📥 Install dependencies
+      if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: make install
