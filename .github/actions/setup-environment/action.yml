@@ -12,8 +12,9 @@ runs:
       uses: actions/cache@v3
       env:
         cache-name: cache-asdf
+        cache-path: ~/.asdf
       with:
-        path: ~/.asdf
+        path: ${{ env.cache-path }}
         key: ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}
         restore-keys: |
           ${{ runner.os }}-se-${{ env.cache-name }}-
@@ -23,18 +24,17 @@ runs:
       continue-on-error: true
       uses: asdf-vm/actions/install@v2
 
-    - name: 🗂️ Cache venv
+    - name: 🗂️ Cache .venv
       id: cache-venv
       uses: actions/cache@v3
       env:
         cache-name: cache-venv
+        cache-path: .venv
       with:
-        path: .venv
+        path: ${{ env.cache-path }}
         key:
           ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}-${{
           hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-se-${{ env.cache-name }}-${{ hashFiles('**/.tool-versions') }}-
 
     - name: 📥 Install dependencies
       if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
