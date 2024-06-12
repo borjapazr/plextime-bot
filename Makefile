@@ -14,14 +14,13 @@ SHELL := $(shell which bash)
 .DEFAULT_GOAL := help
 
 ## Binaries to use in the Makefile ##
-DOCKER := DOCKER_BUILDKIT=1 $(shell command -v docker)
-DOCKER_COMPOSE := COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 $(shell command -v docker-compose)
+DOCKER_BIN := $(shell command -v docker)
+POETRY_BIN := $(shell command -v poetry)
+## Commands and files to use in the Makefile ##
+DOCKER := $(if $(DOCKER_BIN), DOCKER_BUILDKIT=1 $(DOCKER_BIN),)
+DOCKER_COMPOSE := $(if $(DOCKER_BIN), DOCKER_BUILDKIT=1 $(DOCKER_BIN) compose,)
+POETRY := $(if $(POETRY_BIN),$(POETRY_BIN)$(if $(filter true,$(CI_ENVIRONMENT)), -n),)
 DOCKER_COMPOSE_FILE := $(ROOT_DIR)/docker/docker-compose.yml
-ifeq ($(CI_ENVIRONMENT), true)
-POETRY := $(shell command -v poetry) -n
-else
-POETRY := $(shell command -v poetry)
-endif
 
 .PHONY: help
 help: ## Show this help
@@ -30,15 +29,15 @@ help: ## Show this help
 .PHONY: requirements
 requirements: ## Check if requirements are satisfied
 ifndef DOCKER
-	@echo "🐳 Docker is not available. Please install docker."
+	@echo "🐳 Docker is not available. Please install Docker."
 	@exit 1
 endif
 ifndef DOCKER_COMPOSE
-	@echo "🐳🧩 docker-compose is not available. Please install docker-compose."
+	@echo "🐳🧩 docker-compose is not available. Please install Docker Compose."
 	@exit 1
 endif
 ifndef POETRY
-	@echo "📦🧩 poetry is not available. Please install poetry."
+	@echo "📦🧩 poetry is not available. Please install Poetry."
 	@exit 1
 endif
 	@echo "🆗 The necessary dependencies are already installed"
