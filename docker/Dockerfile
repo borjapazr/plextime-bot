@@ -33,14 +33,14 @@ EOF
 FROM python:${PYTHON_VERSION}-alpine as runtime
 
 LABEL maintainer="Borja Paz Rodríguez <borjapazr@gmail.com>" \
-  version="1.1.0" \
+  version="1.2.0" \
   description="🤖⏰ Bot for automatic check-in and check-out on Plextime platform" \
   license="MIT" \
   org.label-schema.name="PlextimeBot" \
   org.label-schema.description="🤖⏰ Bot for automatic check-in and check-out on Plextime platform" \
   org.label-schema.url="https://bpaz.dev" \
   org.label-schema.vcs-url="https://github.com/borjapazr/plextime-bot" \
-  org.label-schema.version="1.1.0" \
+  org.label-schema.version="1.2.0" \
   org.label-schema.schema-version="1.0"
 
 ENV PYTHONFAULTHANDLER=true \
