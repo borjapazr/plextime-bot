@@ -1,8 +1,9 @@
-# syntax=docker/dockerfile:1.6-labs
-
 ARG PYTHON_VERSION=3.11
+ARG POETRY_VERSION=1.6.1
 
-FROM python:${PYTHON_VERSION}-buster as builder
+FROM python:${PYTHON_VERSION}-buster AS builder
+
+ARG POETRY_VERSION
 
 ENV PYTHONFAULTHANDLER=true \
   PYTHONUNBUFFERED=true \
@@ -10,7 +11,6 @@ ENV PYTHONFAULTHANDLER=true \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_DISABLE_PIP_VERSION_CHECK=true \
   PIP_NO_CACHE_DIR=true \
-  POETRY_VERSION=1.6.1 \
   POETRY_VIRTUALENVS_IN_PROJECT=true \
   POETRY_VIRTUALENVS_CREATE=true
 
@@ -25,12 +25,10 @@ RUN poetry install --no-cache --no-interaction --no-ansi --no-root --only main
 COPY --link plextime_bot ./plextime_bot/
 COPY --link README.md py.typed ./
 
-RUN <<EOF
-poetry build --no-cache -f wheel
-./.venv/bin/pip install --no-cache-dir --only-binary :all: dist/*.whl
-EOF
+RUN poetry build --no-cache -f wheel && \
+  ./.venv/bin/pip install --no-cache-dir --only-binary :all: dist/*.whl
 
-FROM python:${PYTHON_VERSION}-alpine as runtime
+FROM python:${PYTHON_VERSION}-alpine AS runtime
 
 LABEL maintainer="Borja Paz Rodríguez <borjapazr@gmail.com>" \
   version="1.2.0" \
