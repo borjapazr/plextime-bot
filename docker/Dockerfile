@@ -53,4 +53,6 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 VOLUME ["/bot/logs"]
 
+HEALTHCHECK --start-period=20s --interval=30s --timeout=3s --retries=5 CMD pgrep -f plextime_bot > /dev/null || exit 1
+
 CMD ["python", "-m", "plextime_bot"]
